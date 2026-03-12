@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +13,11 @@ const navItems = [
 export function MainShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50">
@@ -47,7 +53,9 @@ export function MainShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2 text-sm">
-            {user ? (
+            {!isMounted ? (
+              <div className="h-8 w-20 animate-pulse rounded-full bg-slate-800" />
+            ) : user ? (
               <>
                 <span className="hidden text-slate-300 md:inline">
                   Hi, <span className="font-semibold">{user.name}</span>
@@ -83,7 +91,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
 
       <footer className="border-t border-slate-800 bg-slate-950/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} SkillNest Academy. All rights reserved.</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} SkillNest Academy. All rights reserved.</p>
           <p className="hidden gap-3 md:flex">
             <span>Privacy</span>
             <span>Terms</span>
@@ -94,4 +102,3 @@ export function MainShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-

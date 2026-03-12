@@ -12,7 +12,6 @@ type PaymentStep = "selection" | "upi" | "card" | "processing" | "success";
 export default function EnrollButton({ courseTitle, coursePrice }: EnrollButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState<PaymentStep>("selection");
-    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleEnrollClick = () => {
         setIsOpen(true);

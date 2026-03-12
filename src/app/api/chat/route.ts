@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 const KNOWLEDGE_BASE: Record<string, string> = {
     "python": "Python is a high-level, interpreted programming language known for its readability and versatility. It's the standard for Data Science and Machine Learning. In SkillNest, we offer a comprehensive course covering everything from basic syntax to advanced ML models.",
+    "java": "Java is a popular, class-based, object-oriented programming language. It is widely used for building enterprise-scale applications, Android apps, and backend systems. While we don't have a dedicated Java course yet, our DSA masterclass uses Java-like patterns for algorithmic thinking.",
     "react": "React is a powerful JavaScript library for building user interfaces, developed by Meta. It uses a component-based architecture and a virtual DOM for efficient rendering. Our React & TypeScript Mastery course deep-dives into these concepts.",
     "nextjs": "Next.js is a React framework that enables server-side rendering and static site generation. Version 14 introduced the App Router and Server Actions, which we cover extensively in our Bootcamp.",
     "javascript": "JavaScript is the primary language of the web. It's used for client-side interactivity and server-side logic (via Node.js). It's a key requirement for all our fullstack courses.",
@@ -15,47 +16,44 @@ const KNOWLEDGE_BASE: Record<string, string> = {
     "status": "I am fully operational and ready to assist you!",
     "query": "A query is a request for information from a database or a system. In the context of this chat, your query is what you just typed! I'm here to answer it accurately.",
     "what is python": "Python is a versatile, high-level programming language used in web development, data science, and automation. Its clean syntax makes it ideal for beginners, which is why our Python course is so popular!",
+    "angular": "Angular is a platform and framework for building single-page client applications using HTML and TypeScript. It's a major competitor to React.",
+    "vue": "Vue.js is a progressive JavaScript framework for building user interfaces, known for its approachability and performance.",
 };
 
 export async function POST(req: Request) {
     try {
         const { messages } = await req.json();
-        const lastMessage = messages[messages.length - 1].content.toLowerCase();
+        const apiToken = process.env.HUGGINGFACE_API_TOKEN;
 
-        // Find the best match in our knowledge base
-        let response = "That is a great question! I'm constantly learning more about that topic. Could you please provide more details so I can give you a more specific answer? In the meantime, feel free to ask about Python, React, Next.js, or our course pricing!";
-
-        for (const key in KNOWLEDGE_BASE) {
-            if (lastMessage.includes(key)) {
-                response = KNOWLEDGE_BASE[key];
-                break;
-            }
+        if (!apiToken) {
+            return new NextResponse(JSON.stringify({ error: "Hugging Face API token not configured" }), { status: 500 });
         }
 
-        // Comprehensive Fallback for programming topics
-        if (lastMessage.includes("how to") || lastMessage.includes("code") || lastMessage.includes("create")) {
-            response = "To implement that, I recommend starting with the fundamental concepts in our related course. For example, if you're building a web app, our Next.js Bootcamp covers project structure, routing, and data handling in detail. Would you like me to highlight specific lessons for you?";
-        }
+        // Use a widely available model that is supported by HF Router
+        const model = "meta-llama/Meta-Llama-3-8B-Instruct";
 
-        // Simulate streaming for a realistic AI feel
-        const encoder = new TextEncoder();
-        const stream = new ReadableStream({
-            async start(controller) {
-                const words = response.split(" ");
-                for (const word of words) {
-                    // Add data: prefix to match the streaming format expected by the frontend
-                    const data = JSON.stringify({
-                        choices: [{ delta: { content: word + " " } }]
-                    });
-                    controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-                    await new Promise((resolve) => setTimeout(resolve, 30)); // Delay per word
-                }
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-                controller.close();
+        console.log(`Sending request to HF Router with model: ${model}`);
+        const response = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiToken}`,
             },
+            body: JSON.stringify({
+                model,
+                messages,
+                stream: true,
+            }),
         });
 
-        return new Response(stream, {
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Hugging Face API Error:", errorText);
+            // Return the actual error message to the frontend for debugging
+            return new NextResponse(JSON.stringify({ error: errorText || `API Error: ${response.status}` }), { status: response.status });
+        }
+
+        return new Response(response.body, {
             headers: {
                 "Content-Type": "text/event-stream",
                 "Cache-Control": "no-cache",

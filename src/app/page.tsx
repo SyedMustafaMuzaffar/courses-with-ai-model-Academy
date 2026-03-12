@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { courses } from "@/data/courses";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
-  const featured = courses[0];
+  const { user } = useAuth();
 
   return (
     <div className="relative isolate space-y-24 pb-20">
@@ -32,12 +35,14 @@ export default function Home() {
               <span className="relative z-10">Start Your Journey</span>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
             </Link>
-            <Link
-              href="/auth/signup"
-              className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/50 px-10 text-lg font-bold text-white transition-all hover:bg-slate-800"
-            >
-              Free Account
-            </Link>
+            {!user && (
+              <Link
+                href="/auth/signup"
+                className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/50 px-10 text-lg font-bold text-white transition-all hover:bg-slate-800"
+              >
+                Free Account
+              </Link>
+            )}
           </div>
           <div className="flex items-center justify-center gap-8 pt-8 text-xs font-bold uppercase tracking-widest text-slate-500">
             <div className="flex items-center gap-2">
@@ -78,7 +83,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 font-mono text-sm text-purple-300">
-                <span className="text-slate-500">// AI Intelligence Status </span><br />
+                <span className="text-slate-500">{"//"} AI Intelligence Status </span><br />
                 <span className="text-emerald-400">READY</span> : Llama-3.2 Model Active
               </div>
             </div>
@@ -198,4 +203,3 @@ export default function Home() {
     </div>
   );
 }
-

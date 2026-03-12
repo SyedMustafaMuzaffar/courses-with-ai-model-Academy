@@ -1,80 +1,21 @@
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --background: #020617;
   --foreground: #f8fafc;
-  --accent-purple: #a855f7;
-  --accent-blue: #38bdf8;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
-/* Futuristic Animations */
-@keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* Utility Classes */
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.glass-morphism {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.neon-border {
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #fff 0%, #a855f7 50%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #020617;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+/* Force pointer events diagnostic */
+* {
+  pointer-events: auto !important;
+  user-select: auto !important;
 }

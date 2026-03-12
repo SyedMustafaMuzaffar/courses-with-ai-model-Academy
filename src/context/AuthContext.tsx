@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 type User = {
@@ -32,20 +32,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const stored = globalThis?.localStorage.getItem(LOCAL_STORAGE_KEY);
     if (stored) {
-      setUser(JSON.parse(stored));
+      try {
+        setUser(JSON.parse(stored));
+      } catch (err) {
+        console.error("Auth: Error parsing stored user", err);
+        globalThis?.localStorage.removeItem(LOCAL_STORAGE_KEY);
+      }
     }
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    const isPublicRoute = publicRoutes.has(pathname) || pathname.startsWith("/courses");
+    // Wait for initial load
+    if (loading) return;
 
-    if (!loading && !user && !isPublicRoute) {
+    const isPublicRoute = publicRoutes.has(pathname);
+
+    if (!user && !isPublicRoute) {
       router.replace("/auth/login");
     }
   }, [loading, user, pathname, router]);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     if (!email || !password) {
       throw new Error("Please enter email and password.");
     }
@@ -61,9 +69,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(existing);
-  };
+  }, []);
 
-  const signup = async (name: string, email: string, password: string) => {
+  const signup = useCallback(async (name: string, email: string, password: string) => {
     if (!name || !email || !password) {
       throw new Error("All fields are required.");
     }
@@ -75,22 +83,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     globalThis.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newUser));
-    setUser(newUser);
-  };
+    // No setUser here as per new flow
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     globalThis.localStorage.removeItem(LOCAL_STORAGE_KEY);
     router.push("/");
-  };
+  }, [router]);
 
-  const value: AuthContextValue = {
+  const value = useMemo(() => ({
     user,
     loading,
     login,
     signup,
     logout,
-  };
+  }), [user, loading, login, signup, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -102,4 +110,3 @@ export const useAuth = () => {
   }
   return ctx;
 };
-
