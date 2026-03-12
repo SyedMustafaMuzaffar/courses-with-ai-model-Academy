@@ -14,7 +14,6 @@ export default async function CourseDetailPage({ params }: Props) {
     notFound();
   }
 
-  const firstLesson = course.curriculum[0];
 
   return (
     <div className="space-y-8">
@@ -94,7 +93,7 @@ export default async function CourseDetailPage({ params }: Props) {
       <section className="grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)]">
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-slate-100 sm:text-base">
-            What you'll learn
+            What you&apos;ll learn
           </h2>
           <div className="grid gap-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-xs text-slate-300 sm:grid-cols-2 sm:text-sm">
             {course.whatYouWillLearn.map((item) => (
