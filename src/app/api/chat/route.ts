@@ -26,7 +26,9 @@ export async function POST(req: Request) {
         const apiToken = process.env.HUGGINGFACE_API_TOKEN;
 
         if (!apiToken) {
-            return new NextResponse(JSON.stringify({ error: "Hugging Face API token not configured" }), { status: 500 });
+            return new NextResponse(JSON.stringify({
+                error: "Hugging Face API token not configured. Please add HUGGINGFACE_API_TOKEN to your Vercel Environment Variables."
+            }), { status: 500 });
         }
 
         // Use a widely available model that is supported by HF Router
